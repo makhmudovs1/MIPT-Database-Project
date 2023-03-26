@@ -13,3 +13,32 @@
 5. Декодирование и ранжирование ответов: Модель генерирует несколько возможных ответов, которые декодируются из токенов обратно в текст. Затем система ранжирует ответы на основе вероятности и релевантности для входящего запроса.
 6. Постобработка текста: В этом модуле текст ответа проверяется на грамматику, стилистику и корректность, чтобы обеспечить высокое качество окончательного ответа.
 7. Выходной интерфейс: Окончательный ответ отображается пользователю через интерфейс, откуда он вводил свой запрос.
+
+### Физическая модель
+
+Таблицы и поля:
+a. users: id, name, preferences
+b. input_interfaces: id, user_id, interface_type, language, input_limit, user_context
+c. user_requests: id, input_interface_id, raw_text, timestamp
+d. preprocessing_results: id, user_request_id, cleaned_text
+e. encoding_results: id, preprocessing_result_id, tokenized_text
+f. chatgpt_responses: id, encoding_result_id, generated_response
+g. decoding_ranking_results: id, chatgpt_response_id, ranked_response
+h. postprocessing_results: id, decoding_ranking_result_id, final_response
+
+
+### Отношения:
+
+a. users (1) --- () input_interfaces: один пользователь может иметь несколько интерфейсов ввода.
+
+b. input_interfaces (1) --- () user_requests: через один интерфейс ввода может быть отправлено несколько запросов.
+
+c. user_requests (1) --- (1) preprocessing_results: каждый пользовательский запрос имеет один результат предобработки.
+
+d. preprocessing_results (1) --- (1) encoding_results: каждый результат предобработки имеет один результат кодирования.
+
+e. encoding_results (1) --- () chatgpt_responses: каждый результат кодирования может иметь несколько сгенерированных ответов ChatGPT.
+
+f. chatgpt_responses (1) --- (1) decoding_ranking_results: каждый сгенерированный ответ ChatGPT имеет один результат декодирования и ранжирования.
+
+g. decoding_ranking_results (1) --- (1) postprocessing_results: каждый результат декодирования и ранжирования имеет один результат постобработки.h. postprocessing_results (1) --- () input_interfaces: один результат постобработки может быть отправлен через несколько интерфейсов ввода.
